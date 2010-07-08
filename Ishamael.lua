@@ -45,47 +45,30 @@ function ns:MAIL_SHOW()
 end
 
 
-function ns:GetUnDisenchantableItems()
-  local items, maxLevel = {}, self.GetHighestDisenchantLevel()
-	self.Debug("Max ilevel can disenchant: " .. maxLevel)
-  for bagId=1,NUM_BAG_SLOTS do
-    items[bagId] = {}
-    for slotId=1,GetContainerNumSlots(bagId) do
+function ns:MailUndisenchantableItems(target)
+	if not target then return end
+  local attachments, maxLevel = 0, self.GetHighestDisenchantLevel()
+  for bagId=0,NUM_BAG_SLOTS do
+    for slotId=0,GetContainerNumSlots(bagId) do
       local link = GetContainerItemLink(bagId, slotId)
 			if link then
 				local _, _, quality, itemLevel, _, itemType = GetItemInfo(link)
 				if (quality == 2 and itemLevel > maxLevel and (itemType == "Armor" or itemType == "Weapon") and self:FindTextInTooltip(link, ITEM_BIND_ON_EQUIP)) then
 					self.Print("BOE Green found: " .. link)
-					tinsert(items[bagId], slotId)
+					attachments = attachments + 1
+					PickupContainerItem(bagId, slotId)
+					ClickSendMailItemButton(attachments)
+					if attachments >= ATTACHMENTS_MAX_SEND and GetMoney() > GetSendMailPrice() then
+						self.Print("Mailing " .. attachments .. " items to your recipient.")
+						SendMail(target, "Disenchantable greens", "Please find attached 1 or more Uncommon items that can be disenchanted for materials.\n\nThanks.")
+						attachments = 0
+					end
 				end
 			end
     end
   end
-  return items
-end
-
-
-function ns:MailUndisenchantableItems(target)
-	if not target then return end
-  local attachments, items = 0, self:GetUnDisenchantableItems()
-  for bagId, itemIds in pairs(items) do
-    while #(itemIds) > 0 do
-      local itemId = tremove(itemIds)
-      PickupContainerItem(bagId, itemId)
-      attachments = attachments + 1
-      ClickSendMailItemButton(attachments)
-      if attachments >= ATTACHMENTS_MAX_SEND and GetMoney() > GetSendMailPrice() then
-				self.Print("Mailing " .. attachments .. " items to your recipient.")
-				self.Debug(target)
-        SendMail(target, "Disenchantable greens", "Please find attached 1 or more Uncommon items that can be disenchanted for materials.\n\nThanks.")
-        attachments = 0
-				return
-      end
-    end
-  end
-	if attachments > 0 then
+	if attachments > 0 and GetMoney() > GetSendMailPrice() then
 		self.Print("Mailing " .. attachments .. " items to your recipient.")
-		self.Debug(target)
 		SendMail(target, "Disenchantable greens", "Please find attached 1 or more Uncommon items that can be disenchanted for materials.\n\nThanks.")
 	end
 end
