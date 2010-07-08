@@ -19,6 +19,7 @@
 
 LibStub.lua
 tekKonfigAboutPanel.lua
+LibItemSearch-1.0.lua
 
 Locale.lua
 Database.lua
