@@ -1,0 +1,29 @@
+## Interface: 30300
+
+## Title: Ishamael
+## Notes: Mails BOEs you can't DE to someone who can (maybe)
+## Author: Ithato
+## Version: Alpha
+## X-Website: http://ithato.com/
+## X-Email: shane@ithato.com
+## X-Category: Mail
+
+## SavedVariables: IshamaelDB
+## SavedVariablesPerCharacter: IshamaelDBPC
+
+## OptionalDeps: tekDebug, tekErr
+
+## LoadManagers: AddonLoader
+## X-LoadOn-Always: delayed
+## X-LoadOn-Slash: /ishamael
+
+LibStub.lua
+tekKonfigAboutPanel.lua
+
+Locale.lua
+Database.lua
+Slashcommand.lua
+UtilityFunctions.lua
+EventDispatcher.lua
+
+Ishamael.lua
