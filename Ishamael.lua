@@ -1,8 +1,6 @@
 
 local myname, ns = ...
 
-local ItemSearch = LibStub:GetLibrary("LibItemSearch-1.0")
-
 ns:RegisterEvent("ADDON_LOADED")
 function ns:ADDON_LOADED(event, addon)
 	if addon ~= myname then return end
