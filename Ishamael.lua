@@ -56,7 +56,7 @@ function ns:GetUnDisenchantableItems()
       local link = GetContainerItemLink(bagId, slotId)
 			if link then
 				local _, _, quality, itemLevel, _, itemType = GetItemInfo(link)
-				if (quality == 2 and itemLevel > maxLevel and (itemType == "Armor" or itemType == "Weapon") and ItemSearch:Find(link, "boe")) then
+				if (quality == 2 and itemLevel > maxLevel and (itemType == "Armor" or itemType == "Weapon") and link_FindSearchInTooltip(link, ITEM_BIND_ON_EQUIP)) then
 					self.Print("BOE Green found: " .. link)
 					tinsert(items[bagId], slotId)
 				end
@@ -92,5 +92,32 @@ function ns:MailUndisenchantableItems(target)
 	end
 end
 
+-- All of the below was borrowed from LibItemSearch-1.0 included with BagSync 3.6 by Derkyle
+-- http://wow.curseforge.com/addons/bagsync/
 
-Ishamael = ns
+local tooltipCache = setmetatable({}, {__index = function(t, k) local v = {} t[k] = v return v end})
+local tooltipScanner = _G['LibItemSearchTooltipScanner'] or CreateFrame('GameTooltip', 'LibItemSearchTooltipScanner', UIParent, 'GameTooltipTemplate')
+
+local function link_FindSearchInTooltip(itemLink, search)
+	--look in the cache for the result
+	local itemID = itemLink:match('item:(%d+)')
+	local cachedResult = tooltipCache[search][itemID]
+	if cachedResult ~= nil then
+		return cachedResult
+	end
+
+	--no match?, pull in the resut from tooltip parsing
+	tooltipScanner:SetOwner(UIParent, 'ANCHOR_NONE')
+	tooltipScanner:SetHyperlink(itemLink)
+
+	local result = false
+	if tooltipScanner:NumLines() > 1 and _G[tooltipScanner:GetName() .. 'TextLeft2']:GetText() == search then
+		result = true
+	elseif tooltipScanner:NumLines() > 2 and _G[tooltipScanner:GetName() .. 'TextLeft3']:GetText() == search then
+		result = true
+	end
+	tooltipScanner:Hide()
+
+	tooltipCache[search][itemID] = result
+	return result
+end
