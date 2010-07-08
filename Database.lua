@@ -3,9 +3,7 @@ local myname, ns = ...
 
 
 ns.defaults = {}
-ns.defaultsPC = {
-  recipient = "Manterfel",
-}
+ns.defaultsPC = {}
 
 
 function ns.InitDB()
