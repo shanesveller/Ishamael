@@ -54,7 +54,7 @@ function ns:GetUnDisenchantableItems()
       local link = GetContainerItemLink(bagId, slotId)
 			if link then
 				local _, _, quality, itemLevel, _, itemType = GetItemInfo(link)
-				if (quality == 2 and itemLevel > maxLevel and (itemType == "Armor" or itemType == "Weapon") and link_FindSearchInTooltip(link, ITEM_BIND_ON_EQUIP)) then
+				if (quality == 2 and itemLevel > maxLevel and (itemType == "Armor" or itemType == "Weapon") and self:FindTextInTooltip(link, ITEM_BIND_ON_EQUIP)) then
 					self.Print("BOE Green found: " .. link)
 					tinsert(items[bagId], slotId)
 				end
@@ -96,7 +96,8 @@ end
 local tooltipCache = setmetatable({}, {__index = function(t, k) local v = {} t[k] = v return v end})
 local tooltipScanner = _G['LibItemSearchTooltipScanner'] or CreateFrame('GameTooltip', 'LibItemSearchTooltipScanner', UIParent, 'GameTooltipTemplate')
 
-local function link_FindSearchInTooltip(itemLink, search)
+-- Renamed from link_FindSearchInTooltip to fix nil error (I hope)
+function ns:FindTextInTooltip(itemLink, search)
 	--look in the cache for the result
 	local itemID = itemLink:match('item:(%d+)')
 	local cachedResult = tooltipCache[search][itemID]
